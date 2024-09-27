@@ -1,5 +1,7 @@
 package yoon.tutorials.shoppinglistapp
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -19,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -58,6 +62,8 @@ fun ShoppingListApp() {
             //LazyColumn 내부항목
             //위에서 선언한 sItems항목을 렌더링하는  LazyListScope.items함수
             items(sItems) {
+                //밑에 만들어둔 컴포저블 함수를 LazyColumn 내부의 내용으로 사용
+                ShoppingItemList(item = it, onEditClick = {}, onDeleteClick = {})
 
             }
         }
@@ -81,11 +87,11 @@ fun ShoppingListApp() {
                     //추가버튼
                     Button(onClick = {
                         //Add 버튼을 클릭했을때 itemName이 비어있지않다면
-                        if (itemName.isNotBlank()){
+                        if (itemName.isNotBlank()) {
                             //새로운 아이템 생성하고
                             val newItem = ShoppingItem(
                                 //id는 현재 아이템목록크기에서 +1
-                                id = sItems.size+1,
+                                id = sItems.size + 1,
                                 //name은 텍스트필드에 입력한 텍스트
                                 name = itemName,
                                 //텍스트필드에 입력한 String type 숫자를 int로 변환
@@ -94,6 +100,7 @@ fun ShoppingListApp() {
                             )
                             //Add 버튼을 클릭했을때 itemName이 비어있지않다면
                             //쇼핑목록 상태에 새로 생성한 아이템을추가
+                            //TODO
                             sItems = sItems + newItem
                             //대화상자를 닫기
                             showDialog = false
@@ -147,5 +154,32 @@ fun ShoppingListApp() {
             }
 
         )
+    }
+}
+
+//쇼핑 목록을 나타내는 컴포저블 함수
+@Composable
+fun ShoppingItemList(
+    item: ShoppingItem,
+    //Unit은 void와 비슷한 개념이고 실제객체로 존재하기 때문에 변수나 함수의 타입으로 지정할수있다
+    //하지만 기본적으로 Kotlin은 명시적이거나 유추할수있는 경우가 아니면 Unit타입으로 간주한다
+    //이하의 경우는 함수의 ShoppingItemList의 파라미터로 함수를 받을수 있게 하는 코드
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    //가로로 나열될 itemName과 quantity
+    Row(
+        //패딩을 주고 가로넓이 전체차지하도록설정 Row요소의 테두리 굵기, 색상 , 모양지정
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .border(
+                border = BorderStroke(2.dp, Color.DarkGray),
+                //20퍼센트 만큼 둥글게 설정
+                shape = RoundedCornerShape(percent = 20)
+            )
+    ) {
+        //텍스트필드에 입력한 itemName, padding 설정
+        Text(text = item.name, modifier = Modifier.padding(8.dp))
     }
 }
