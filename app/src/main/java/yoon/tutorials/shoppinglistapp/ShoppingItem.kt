@@ -2,10 +2,10 @@ package yoon.tutorials.shoppinglistapp
 
 /**
  * 메인 액티비티에서 사용될 domain class
- * @param id
- * @param name
- * @param quantity
- * @param isEditing
+ * @param id 쇼핑항목을 구분하는 고유 id
+ * @param name 쇼핑항목의 이름
+ * @param quantity 쇼핑항목의 갯수
+ * @param isEditing 쇼핑항목이 현재 편집모드인지 아닌지 나타내는 상태
  */
 data class ShoppingItem(
     val id: Int,

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -40,7 +39,7 @@ fun ShoppingListApp() {
     // Kotlin listOf는 기본적으로 불변이다 리스트를 변경하고싶다면 MutableList로 선언해야한다
 
     //ShoppingItem객체타입의 리스트의 상태를 관리하는 변수
-    var sItems by remember { mutableStateOf(listOf<ShoppingItem>()) }
+    var shoppingItemList by remember { mutableStateOf(listOf<ShoppingItem>()) }
     //Add Item버튼을 눌렀을때 Dialog창의 표시상태여부를 가지는 변수 선언
     var showDialog by remember { mutableStateOf(false) }
     //itemName 변수 초기값 빈문자열
@@ -64,7 +63,7 @@ fun ShoppingListApp() {
         {
             Text(text = "Add Item")
         }
-        //스크롤에 따라 눈에 보이는것만 렌더링하는 LazyColumn
+        //스크롤에 따라 눈에 보이는것만 렌더링하는 LazyColumn은 무한한 Column이 있다고 가정
         LazyColumn(
             //LazyColumn 내부 항목이 Add Item 버튼을 위로 밀어내도록 modifier 설정
             modifier = Modifier
@@ -72,11 +71,51 @@ fun ShoppingListApp() {
                 .padding(16.dp)
         ) {
             //LazyColumn 내부항목
-            //위에서 선언한 sItems항목을 렌더링하는  LazyListScope.items함수
-            items(sItems) {
+            //위에서 선언한 shoppingItemList 항목을 렌더링하는  LazyListScope.items함수
+            items(shoppingItemList) {
                 //밑에 만들어둔 컴포저블 함수를 LazyColumn 내부의 내용으로 사용
-                ShoppingItemList(item = it, onEditClick = {}, onDeleteClick = {})
+                //ShoppingItem객체의 isEditing이 true냐 false냐에 따라서 보여줄 UI를 다르게한다
+                //isEditing이 true라면 현재 편집모드상태인것, isEditing이 false라면 편집모드가 아닌것
+                //ShoppingItem의 상태가 (람다함수)
+                    item ->
+                    //ShoppingItem객체가 현재 편집모드(true)라면
+                if (item.isEditing) {
+                    //ShoppingItemEditor 함수를 보여준다
+                    ShoppingItemEditor(item = item, onEditComplete = {
+                        //아이템 이름과 수량을 전달받아 편집을 완료하는 람다 함수
+                            editedName, editedQuantiy ->
+                        //TODO
+                        //수정이 완료되면 편집모드는 종료되어야 하기 때문에
+                        // 쇼핑목록리스트의 항목객체(ShoppingItem)들을 복사해서 편집상태가 false인 리스트로 반환
+                        shoppingItemList = shoppingItemList.map { it.copy(isEditing = false) }
+                        //TODO
+                        //목록중에서 현재 보이는 항목(it)과 편집중인 항목(item)의 id가 일치하는지 확인해서 편집중인 항목찾기
+                        val editedItem = shoppingItemList.find { it.id == item.id }
+                        //찾은 ShoppingItem이 null이 아닐경우 let함수 실행
+                        editedItem?.let {
+                            //기존 항목의 이름과 수량을 편집창에서 수정된 이름과 수량으로 교체
+                            it.name = editedName
+                            it.quantity = editedQuantiy
+                        }
 
+                    })
+                } else {
+                    //ShoppingItem객체가 현재 편집모드가 아니라면
+                    //ShoppingItemList 함수를 보여준다
+                    ShoppingItemList(item = item,
+                        onEditClick = {
+                            //TODO
+                            //1.편집버튼을 눌렀을때 어떤 항목의 편집버튼을 눌렀는지 찾는다
+                            //2.isEditing을 true로 설정해서 편집모드(ShoppingItemEditor)를 시작
+                            shoppingItemList =
+                                shoppingItemList.map { it.copy(isEditing = it.id == item.id) }
+                        },
+                        onDeleteClick = {
+                            //목록화면에서 삭제 버튼을 눌렀을때 해당 항목을 리스트에서 제거후 상태반환
+                            shoppingItemList = shoppingItemList - item
+                        }
+                    )
+                }
             }
         }
     }
@@ -103,7 +142,7 @@ fun ShoppingListApp() {
                             //새로운 아이템 생성하고
                             val newItem = ShoppingItem(
                                 //id는 현재 아이템목록크기에서 +1
-                                id = sItems.size + 1,
+                                id = shoppingItemList.size + 1,
                                 //name은 텍스트필드에 입력한 텍스트
                                 name = itemName,
                                 //텍스트필드에 입력한 String type 숫자를 int로 변환
@@ -112,11 +151,10 @@ fun ShoppingListApp() {
                             )
                             //Add 버튼을 클릭했을때 itemName이 비어있지않다면
                             //쇼핑목록 상태에 새로 생성한 아이템을추가
-                            //TODO
                             //1. 기존의 `sItems`는 그대로 유지됩니다. (불변이므로 변경되지 않음)
                             //2. 새로운 `newItem`을 기존의 `sItems`에 **추가한 새로운 리스트**를 생성합니다.
                             //3. 그 새 리스트를 `sItems`에 다시 할당하여 상태를 업데이트합니다.
-                            sItems = sItems + newItem
+                            shoppingItemList = shoppingItemList + newItem
                             //대화상자를 닫기
                             showDialog = false
                             //새로운 아이템이 추가후 다시 대화상자가 열렸을때 텍스트필드 비우기
@@ -173,9 +211,9 @@ fun ShoppingListApp() {
 }
 
 /**
- * 쇼핑 목록 편집을 위한 연필 아이콘을 클릭했을 경우의 컴포저블 함수.
+ * 쇼핑 목록 편집을 위한 연필 아이콘을 클릭했을 경우의 항목이름과 수량을 입력하는 컴포저블 함수.
  *
- * @param item 편집할 쇼핑 아이템을 나타내는 객체.
+ * @param item 편집할 ShoppingItem 객체.
  * @param onEditComplete 아이템 이름과 수량을 전달받아 편집을 완료하는 람다 함수.
  */
 @Composable
@@ -218,7 +256,7 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
             // 저장 버튼을 클릭하면
             onClick = {
                 isEditing = false // 편집 모드를 종료
-                // 수정한 이름과 수량을 전달
+                // 수정한 이름과 수량을 전달받음
                 // 수량을 Int로 변환할 수 있으면 변환하고, 변환이 불가할 경우 null로 변환
                 // null일 경우 엘비스 연산자를 사용하여 1로 설정
                 onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
@@ -230,7 +268,12 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
 
 }
 
-//쇼핑 목록을 나타내는 컴포저블 함수
+/**
+ * 쇼핑 목록을 나타내는 컴포저블 함수
+ * @param item
+ * @param onEditClick
+ * @param onDeleteClick
+ */
 @Composable
 fun ShoppingItemList(
     item: ShoppingItem,
@@ -260,12 +303,12 @@ fun ShoppingItemList(
         Row(modifier = Modifier.padding(8.dp)) {
             //아이콘 모양의 버튼 선언
             //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
-            IconButton(onClick = { onEditClick }) {
+            IconButton(onClick = onEditClick ) {
                 //아이콘 모양설정 -> 연필모양 아이콘, 시각장애인용접근성 설명 null
                 Icon(imageVector = Icons.Default.Edit, contentDescription = null)
             }
             //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
-            IconButton(onClick = { onEditClick }) {
+            IconButton(onClick =  onDeleteClick ) {
                 //아이콘 모양설정 -> 휴지통모양 아이콘, 시각장애인용접근성 설명 null
                 Icon(imageVector = Icons.Default.Delete, contentDescription = null)
             }
