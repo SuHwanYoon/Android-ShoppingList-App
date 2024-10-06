@@ -1,6 +1,7 @@
 package yoon.tutorials.shoppinglistapp
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +38,8 @@ import androidx.compose.ui.unit.dp
 fun ShoppingListApp() {
     //JetpackCompose에서 ShoppingItem 타입의 list를 사용하는 객체상태를 관리하는 변수선언
     // Kotlin listOf는 기본적으로 불변이다 리스트를 변경하고싶다면 MutableList로 선언해야한다
+
+    //ShoppingItem객체타입의 리스트의 상태를 관리하는 변수
     var sItems by remember { mutableStateOf(listOf<ShoppingItem>()) }
     //Add Item버튼을 눌렀을때 Dialog창의 표시상태여부를 가지는 변수 선언
     var showDialog by remember { mutableStateOf(false) }
@@ -49,6 +60,7 @@ fun ShoppingListApp() {
             //버튼 수평가운데 정렬
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        //상단에 위치한 버튼
         {
             Text(text = "Add Item")
         }
@@ -101,6 +113,9 @@ fun ShoppingListApp() {
                             //Add 버튼을 클릭했을때 itemName이 비어있지않다면
                             //쇼핑목록 상태에 새로 생성한 아이템을추가
                             //TODO
+                            //1. 기존의 `sItems`는 그대로 유지됩니다. (불변이므로 변경되지 않음)
+                            //2. 새로운 `newItem`을 기존의 `sItems`에 **추가한 새로운 리스트**를 생성합니다.
+                            //3. 그 새 리스트를 `sItems`에 다시 할당하여 상태를 업데이트합니다.
                             sItems = sItems + newItem
                             //대화상자를 닫기
                             showDialog = false
@@ -157,6 +172,64 @@ fun ShoppingListApp() {
     }
 }
 
+/**
+ * 쇼핑 목록 편집을 위한 연필 아이콘을 클릭했을 경우의 컴포저블 함수.
+ *
+ * @param item 편집할 쇼핑 아이템을 나타내는 객체.
+ * @param onEditComplete 아이템 이름과 수량을 전달받아 편집을 완료하는 람다 함수.
+ */
+@Composable
+fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit) {
+    //ShoppingItem객체의 name속성 편집을 위한 상태관찰 변수
+    var editedName by remember { mutableStateOf(item.name) }
+    //ShoppingItem객체의 quantity속성 편집을 위한 상태관찰 변수
+    //숫자형태의 문자열이 들어가야하기때문에 toString을 전환
+    var editedQuantity by remember { mutableStateOf(item.quantity.toString()) }
+    //ShoppingItem객체의 편집여부 상태관찰 변수
+    var isEditing by remember { mutableStateOf(item.isEditing) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth() // Row가 가로로 전체 너비를 차지하도록 설정
+            .background(Color.White) // 배경색을 흰색으로 설정
+            .padding(8.dp), // Row의 내부 여백을 8dp로 설정
+        horizontalArrangement = Arrangement.SpaceEvenly // Row 내의 요소들을 균등하게 배치
+    ) {
+        Column {
+            BasicTextField(
+                value = editedName, // 텍스트 필드의 현재 값
+                onValueChange = { editedName = it }, // 값이 변경될 때 호출되는 콜백
+                singleLine = true, // 한 줄로 입력
+                modifier = Modifier
+                    .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
+                    .padding(8.dp) // 텍스트 필드의 내부 여백을 8dp로 설정
+            )
+            BasicTextField(
+                value = editedQuantity, // 텍스트 필드의 현재 값
+                onValueChange = { editedQuantity = it }, // 값이 변경될 때 호출되는 콜백
+                singleLine = true, // 한 줄로 입력
+                modifier = Modifier
+                    .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
+                    .padding(8.dp) // 텍스트 필드의 내부 여백을 8dp로 설정
+            )
+        }
+        // 저장 버튼
+        Button(
+            // 저장 버튼을 클릭하면
+            onClick = {
+                isEditing = false // 편집 모드를 종료
+                // 수정한 이름과 수량을 전달
+                // 수량을 Int로 변환할 수 있으면 변환하고, 변환이 불가할 경우 null로 변환
+                // null일 경우 엘비스 연산자를 사용하여 1로 설정
+                onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
+            }
+        ) {
+            Text(text = "Save") // 버튼의 텍스트를 "Save"로 설정
+        }
+    }
+
+}
+
 //쇼핑 목록을 나타내는 컴포저블 함수
 @Composable
 fun ShoppingItemList(
@@ -179,7 +252,23 @@ fun ShoppingItemList(
                 shape = RoundedCornerShape(percent = 20)
             )
     ) {
-        //텍스트필드에 입력한 itemName, padding 설정
+        //텍스트필드에 입력한 itemName의 상태를 감지하여 표시, padding 설정
         Text(text = item.name, modifier = Modifier.padding(8.dp))
+        //텍스트필드에 입력한 itemQuantity의 상태를 감지하여 표시
+        Text(text = "Qty:${item.quantity}", modifier = Modifier.padding(8.dp))
+        //Row 영어안에 Row영역넣기
+        Row(modifier = Modifier.padding(8.dp)) {
+            //아이콘 모양의 버튼 선언
+            //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
+            IconButton(onClick = { onEditClick }) {
+                //아이콘 모양설정 -> 연필모양 아이콘, 시각장애인용접근성 설명 null
+                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            }
+            //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
+            IconButton(onClick = { onEditClick }) {
+                //아이콘 모양설정 -> 휴지통모양 아이콘, 시각장애인용접근성 설명 null
+                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+            }
+        }
     }
 }

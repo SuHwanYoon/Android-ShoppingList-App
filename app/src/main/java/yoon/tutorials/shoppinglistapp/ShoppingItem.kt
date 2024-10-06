@@ -1,6 +1,12 @@
 package yoon.tutorials.shoppinglistapp
 
-//메인 액티비티에서 사용될 domain class
+/**
+ * 메인 액티비티에서 사용될 domain class
+ * @param id
+ * @param name
+ * @param quantity
+ * @param isEditing
+ */
 data class ShoppingItem(
     val id: Int,
     var name: String,
@@ -10,3 +16,6 @@ data class ShoppingItem(
 ) {
 
 }
+
+
+

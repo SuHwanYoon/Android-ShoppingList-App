@@ -11,3 +11,7 @@
     <img src="app/src/main/res/images/keyboardDialog.png" alt="keyboardDialog" width="300"/>
     <img src="app/src/main/res/images/itemNameUI.png" alt="itemNameUI" width="300"/>
 </div>
+<div style="display: inline-block;">
+    <img src="app/src/main/res/images/ItemNameQuantity.png" alt="imageLoading...." width="300"/>
+    <img src="app/src/main/res/images/EditDeleteIcon.png" alt="imageLoading...." width="300"/>
+</div>
