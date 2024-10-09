@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,7 +79,7 @@ fun ShoppingListApp() {
                 //isEditing이 true라면 현재 편집모드상태인것, isEditing이 false라면 편집모드가 아닌것
                 //ShoppingItem의 상태가 (람다함수)
                     item ->
-                    //ShoppingItem객체가 현재 편집모드(true)라면
+                //ShoppingItem객체가 현재 편집모드(true)라면
                 if (item.isEditing) {
                     //ShoppingItemEditor 함수를 보여준다
                     ShoppingItemEditor(item = item, onEditComplete = {
@@ -101,7 +102,7 @@ fun ShoppingListApp() {
                     })
                 } else {
                     //ShoppingItem객체가 현재 편집모드가 아니라면
-                    //ShoppingItemList 함수를 보여준다
+                    //ShoppingItemList 컴포저블 함수를 보여준다
                     ShoppingItemList(item = item,
                         onEditClick = {
                             //TODO
@@ -231,25 +232,34 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
             .fillMaxWidth() // Row가 가로로 전체 너비를 차지하도록 설정
             .background(Color.White) // 배경색을 흰색으로 설정
             .padding(8.dp), // Row의 내부 여백을 8dp로 설정
-        horizontalArrangement = Arrangement.SpaceEvenly // Row 내의 요소들을 균등하게 배치
+//        horizontalArrangement = Arrangement.SpaceEvenly // Row 내의 요소들을 균등하게 배치
+        horizontalArrangement = Arrangement.Center, // 요소들을 가로 가운데로 배치
+        verticalAlignment = Alignment.CenterVertically // 요소들을 세로 가운데 정렬
     ) {
-        Column {
-            BasicTextField(
+        Column(
+            modifier = Modifier
+                .weight(1f) // Column이 가능한 공간을 차지하도록 설정
+                .padding(end = 8.dp) // 버튼과의 간격을 위해 오른쪽 패딩 추가
+        ) {
+            OutlinedTextField(
                 value = editedName, // 텍스트 필드의 현재 값
                 onValueChange = { editedName = it }, // 값이 변경될 때 호출되는 콜백
                 singleLine = true, // 한 줄로 입력
                 modifier = Modifier
                     .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
-                    .padding(8.dp) // 텍스트 필드의 내부 여백을 8dp로 설정
+                    .padding(8.dp), // 텍스트 필드의 내부 여백을 8dp로 설정
+                label = { Text(text = "Enter ItemName")}
             )
-            BasicTextField(
+            OutlinedTextField(
                 value = editedQuantity, // 텍스트 필드의 현재 값
                 onValueChange = { editedQuantity = it }, // 값이 변경될 때 호출되는 콜백
                 singleLine = true, // 한 줄로 입력
                 modifier = Modifier
                     .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
-                    .padding(8.dp) // 텍스트 필드의 내부 여백을 8dp로 설정
+                    .padding(8.dp), // 텍스트 필드의 내부 여백을 8dp로 설정
+                label = { Text(text = "Enter ItemQuantity")}
             )
+
         }
         // 저장 버튼
         Button(
@@ -260,19 +270,23 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
                 // 수량을 Int로 변환할 수 있으면 변환하고, 변환이 불가할 경우 null로 변환
                 // null일 경우 엘비스 연산자를 사용하여 1로 설정
                 onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
-            }
+
+            },
+            //버튼크기를 내용에 맞게 설정
+            modifier = Modifier.wrapContentSize(),
         ) {
             Text(text = "Save") // 버튼의 텍스트를 "Save"로 설정
         }
     }
 
+
 }
 
 /**
  * 쇼핑 목록을 나타내는 컴포저블 함수
- * @param item
- * @param onEditClick
- * @param onDeleteClick
+ * @param item 목록에 나타나는 ShoppingItem객체
+ * @param onEditClick 연필모양 아이콘을 클릭하면 실행되는 함수 ShoppingListApp->ShppingItemEditor에서 호출해서 사용
+ * @param onDeleteClick 휴지통모양 아이콘을 클릭하면 실행되는 함수 ShoppingListApp에서 호출해서 사용
  */
 @Composable
 fun ShoppingItemList(
@@ -293,7 +307,10 @@ fun ShoppingItemList(
                 border = BorderStroke(2.dp, Color.DarkGray),
                 //20퍼센트 만큼 둥글게 설정
                 shape = RoundedCornerShape(percent = 20)
-            )
+            ),
+        //Row레이아웃의 자식 컴포넌트간의 간격을 동일하게 만듬
+        //Text1-왼쪽끝 , Text2-가운데 , Row-오른쪽끝(Icons.Default.Edit+Icons.Default.Delete)의 간격을 동일하게
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         //텍스트필드에 입력한 itemName의 상태를 감지하여 표시, padding 설정
         Text(text = item.name, modifier = Modifier.padding(8.dp))
@@ -303,12 +320,12 @@ fun ShoppingItemList(
         Row(modifier = Modifier.padding(8.dp)) {
             //아이콘 모양의 버튼 선언
             //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
-            IconButton(onClick = onEditClick ) {
+            IconButton(onClick = onEditClick) {
                 //아이콘 모양설정 -> 연필모양 아이콘, 시각장애인용접근성 설명 null
                 Icon(imageVector = Icons.Default.Edit, contentDescription = null)
             }
             //버튼 클릭시 일회성 편집Unit함수를 실행하도록 설정
-            IconButton(onClick =  onDeleteClick ) {
+            IconButton(onClick = onDeleteClick) {
                 //아이콘 모양설정 -> 휴지통모양 아이콘, 시각장애인용접근성 설명 null
                 Icon(imageVector = Icons.Default.Delete, contentDescription = null)
             }

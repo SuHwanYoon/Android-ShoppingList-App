@@ -23,3 +23,7 @@
     <img src="app/src/main/res/drawable/edit_computer.png" alt="edit_computer" width="300"/>
     <img src="app/src/main/res/drawable/delete_item.png" alt="delete_item" width="300"/>
 </div>
+<div style="display: inline-block;">
+    <img src="app/src/main/res/drawable/arr_three_item.png" alt="arr_three_item" width="300"/>
+    <img src="app/src/main/res/drawable/modified_ui.png" alt="modified_ui" width="300"/>
+</div>
