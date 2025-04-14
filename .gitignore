@@ -13,3 +13,47 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# 빌드된 애플리케이션 파일
+*.apk
+*.ap_
+
+# ART/Dalvik VM 파일
+*.dex
+
+# Java 클래스 파일
+*.class
+
+# 생성된 파일들
+bin/
+gen/
+
+# Gradle 파일
+.gradle/
+build/
+
+
+# Proguard
+proguard/
+
+# 로그 파일
+*.log
+
+# Android Studio / IntelliJ IDEA
+.idea/
+
+
+# Windows 파일
+Thumbs.db
+
+# Kotlin 빌드 폴더
+kotlin/
+
+# IntelliJ 출력
+out/
+
+# 기타 임시 파일
+*.swp
+*.swo
+*.tmp
+/app/src/main/res/values/strings.xml
