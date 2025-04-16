@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -141,7 +139,7 @@ fun ShoppingListApp() {
                         //Add 버튼을 클릭했을때 itemName이 비어있지않다면
                         if (itemName.isNotBlank()) {
                             //새로운 아이템 생성하고
-                            val newItem = ShoppingItem(
+                            val newItem = yoon.tutorials.shoppinglistapp.ShoppingItem(
                                 //id는 현재 아이템목록크기에서 +1
                                 id = shoppingItemList.size + 1,
                                 //name은 텍스트필드에 입력한 텍스트
@@ -248,7 +246,7 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
                 modifier = Modifier
                     .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
                     .padding(8.dp), // 텍스트 필드의 내부 여백을 8dp로 설정
-                label = { Text(text = "Enter ItemName")}
+                label = { Text(text = "Enter ItemName") }
             )
             OutlinedTextField(
                 value = editedQuantity, // 텍스트 필드의 현재 값
@@ -257,7 +255,7 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
                 modifier = Modifier
                     .wrapContentSize() // 텍스트 필드의 크기를 내용에 맞게 조정
                     .padding(8.dp), // 텍스트 필드의 내부 여백을 8dp로 설정
-                label = { Text(text = "Enter ItemQuantity")}
+                label = { Text(text = "Enter ItemQuantity") }
             )
 
         }

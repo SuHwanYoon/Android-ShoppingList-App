@@ -55,6 +55,8 @@ dependencies {
     // google maps compose 라이브러리로, Compose UI에서 Google Maps를 사용할 수 있도록 도와줍니다.
     // Google Maps 라이브러리로, Google Maps API를 사용하여 지도 기능을 구현할 수 있도록 도와줍니다.
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+    // play-services-location 라이브러리로, 위치 서비스를 사용하여 사용자의 현재 위치를 가져올 수 있도록 도와줍니다.
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 
     // AndroidX Lifecycle 라이브러리로, 생명주기 인식 컴포넌트를 사용하여 UI와 데이터의 생명주기를 관리할 수 있도록 도와줍니다.
